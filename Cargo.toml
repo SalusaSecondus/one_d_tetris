@@ -1,0 +1,15 @@
+[package]
+name = "one_d_tetris"
+version = "0.1.0"
+edition = "2024"
+
+[profile.release]
+strip = true  # Automatically strip symbols from the binary.
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[dependencies]
+crossterm = "0.28"
+rand = "0.10.2"
+num-format = "0.4.4"
