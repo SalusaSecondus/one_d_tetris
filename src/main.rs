@@ -6,11 +6,7 @@ use std::{
 };
 
 use crossterm::{
-    cursor,
-    event::{Event, KeyCode, poll, read},
-    execute,
-    style::{self, available_color_count},
-    terminal::{self, enable_raw_mode},
+    cursor, event::{Event, KeyCode, poll, read}, execute, style::{self, available_color_count}, terminal::{self, disable_raw_mode, enable_raw_mode},
 };
 
 use crate::game::{GAME_HEIGHT, GAME_WIDTH, Game};
@@ -26,14 +22,16 @@ fn main() -> Result<(), Box<dyn Error>> {
     if term_size.0 < GAME_WIDTH || term_size.1 < GAME_HEIGHT {
         panic!("Must run in a terminal at least {} rows high and at least {} columns wide.", GAME_WIDTH, GAME_HEIGHT);
     }
-    enable_raw_mode()?;
     execute!(
         stdout(),
         terminal::EnterAlternateScreen,
         cursor::Hide,
         terminal::Clear(terminal::ClearType::All)
     )?;
-    let _ = main_loop(Game::new())?;
+    enable_raw_mode()?;
+    let result = main_loop(Game::new());
+    disable_raw_mode()?;
+    let result = result?;
     sleep(Duration::from_millis(1000));
     execute!(
         stdout(),
@@ -41,6 +39,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         cursor::Show,
         terminal::LeaveAlternateScreen
     )?;
+    println!("\nYour final score was {} on level {} with {} lines!", result.score, result.level(), result.lines);
     Ok(())
 }
 
